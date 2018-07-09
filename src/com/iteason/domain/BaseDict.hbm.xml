@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+   <!-- 配置表与实体对象的关系 -->
+   <!-- package属性:填写一个包名.在元素内部凡是需要书写完整类名的属性,可以直接写简答类名了. -->
+<hibernate-mapping package="com.iteason.domain" >
+	<!-- 
+		class元素: 配置实体与表的对应关系的
+			name: 完整类名
+			table:数据库表名
+	 -->
+	<class name="BaseDict" table="base_dict" >
+		<!-- id元素:配置主键映射的属性
+				):配置数据库中列的长度. 默认值:使用数据库类型的最大长度
+		 -->
+		<id name="dict_id"  >
+			<generator class="assigned"></generator>
+		</id>
+		
+		<property name="dict_type_code"  >
+			<!--  <column name="cust_name" sql-type="varchar" ></column> -->
+		</property>
+		<property name="dict_type_name"  ></property>
+		<property name="dict_item_name"></property>
+		<property name="dict_item_code" ></property>
+		<property name="dict_sort"  ></property>
+		<property name="dict_enable"  ></property>
+		<property name="dict_memo"  ></property>
+		
+	</class>
+</hibernate-mapping>

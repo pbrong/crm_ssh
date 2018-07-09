@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd ">
+		 <!-- 注解扫描 -->
+		 <context:component-scan base-package="com.iteason"></context:component-scan>
+		 	
+		 <!-- 配置c3p0连接池 -->
+		 <bean name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"></bean>
+		 
+		<!-- 核心事务管理器 -->
+		<bean name="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+			<property name="sessionFactory" ref="sessionFactory"></property>
+		</bean>
+		<!-- 配置通知 -->
+		 <!-- <tx:advice id="txAdvice" transaction-manager="transactionManager">
+			<tx:attributes>
+				<tx:method name="save*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+				<tx:method name="persist*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+				<tx:method name="update*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+				<tx:method name="modify*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+				<tx:method name="delete*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+				<tx:method name="remove*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+				<tx:method name="get*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="true" />
+				<tx:method name="find*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="true" />
+				<tx:method name="*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+				</tx:attributes>
+		</tx:advice> -->
+		<!--  织入切点 -->
+		 <!-- <aop:config>
+		 	<aop:pointcut expression="execution(* com.iteason.serviceimp.*ServiceImp.*(..))" id="txPc"/>
+		 	<aop:advisor advice-ref="txAdvice" pointcut-ref="txPc"/>
+		 </aop:config>
+		  -->
+		 <!-- 开启注解事务 -->
+		 <tx:annotation-driven transaction-manager="transactionManager"/>
+		 
+		 
+		<!-- 将sessionFactory配置到spring容器中 -->
+		<!-- 加载配置 方案1、使用外部的hibernatr.cfg.xml配置信息-->
+		 <!-- <bean name="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+			<property name="configLocation" value="classpath:hibernate.cfg.xml"></property>
+		</bean> -->
+		
+		<!-- 加载配置 方案2、在spring容器中配置 -->
+		<bean name="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+			<!-- 将连接池注入到sessionFactory中 -->
+			<property name="dataSource" ref="dataSource"></property>
+			
+			<!-- 配置基本信息 -->
+			<property name="hibernateProperties">
+				<props>
+					<!-- <prop key="hibernate.connection.driver_class">com.mysql.jdbc.Driver</prop>
+					<prop key="hibernate.connection.url">jdbc:mysql:///ssh_crm</prop>
+					<prop key="hibernate.connection.username">root</prop>
+					<prop key="hibernate.connection.password">123</prop> -->
+					<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+					<prop key="hibernate.show_sql">true</prop>
+					<prop key="hibernate.format_sql">true</prop>
+					<prop key="hibernate.hbm2ddl.auto">update</prop>
+				</props>
+			</property>
+			<!-- 引入orm元数据 ,指定orm元数据所在的包路径即可-->
+			<property name="mappingDirectoryLocations" value="classpath:com/iteason/domain"></property>
+		</bean>
+		
+		<!-- 配置dao -->
+		<!-- <bean name="userDao" class="com.iteason.daoimp.UserDaoImp">
+			<property name="sessionFactory" ref="sessionFactory"></property>
+		</bean>
+		<bean name="customerDao" class="com.iteason.daoimp.CustomerDaoImp">
+			<property name="sessionFactory" ref="sessionFactory"></property>
+		</bean>
+		<bean name="baseDictDao" class="com.iteason.daoimp.BaseDictDaoImp">
+			<property name="sessionFactory" ref="sessionFactory"></property>
+		</bean>
+		<bean name="linkManDao" class="com.iteason.daoimp.LinkManDaoImp">
+			<property name="sessionFactory" ref="sessionFactory"></property>
+		</bean>
+		<bean name="saleVisitDao" class="com.iteason.daoimp.SaleVisitDaoImp">
+			<property name="sessionFactory" ref="sessionFactory"></property>
+		</bean>
+		
+		配置service
+		<bean name="userService" class="com.iteason.serviceimp.UserServiceImp">
+			<property name="ud" ref="userDao"></property>
+		</bean>
+		<bean name="customerService" class="com.iteason.serviceimp.CustomerServiceImp">
+			<property name="cd" ref="customerDao"></property>
+		</bean>
+		<bean name="baseDictService" class="com.iteason.serviceimp.BaseDictServiceImp">
+			<property name="bdd" ref="baseDictDao"></property>
+		</bean>
+		<bean name="linkManService" class="com.iteason.serviceimp.LinkManServiceImp">
+			<property name="lmd" ref="linkManDao"></property>
+		</bean>
+		<bean name="saleVisitService" class="com.iteason.serviceimp.SaleVisitServiceImp">
+			<property name="svd" ref="saleVisitDao"></property>
+		</bean>
+		
+		
+		配置action
+		<bean name="userAction" class="com.iteason.web.action.UserAction" scope="prototype">
+			<property name="userService" ref="userService"></property>
+		</bean>
+		<bean name="customerAction" class="com.iteason.web.action.CustomerAction" scope="prototype">
+			<property name="cs" ref="customerService"></property>
+		</bean>
+		<bean name="baseDictAction" class="com.iteason.web.action.BaseDictAction" scope="prototype">
+			<property name="baseDictService" ref="baseDictService"></property>
+		</bean>
+		<bean name="linkManAction" class="com.iteason.web.action.LinkManAction" scope="prototype">
+			<property name="lms" ref="linkManService"></property>
+		</bean>
+		<bean name="saleVisitAction" class="com.iteason.web.action.SaleVisitAction" scope="prototype">
+			<property name="svs" ref="saleVisitService"></property>
+		</bean> -->
+		
+		
+		
+		
+		
+</beans>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<!-- constant配置常量配置 国际化 解决乱码 -->
+	<constant name="struts.i18n.encoding" value="UTF-8"></constant>
+	<!-- 配置开发者常量 1、热部署 2、提供更多的错误提示 -->
+	<constant name="struts.devMode" value="true"></constant>
+	<!-- 动态方法调用 -->
+	<constant name="struts.enable.DynamicMethodInvocation" value="true"></constant>
+	
+	<!-- 将struts2交给spring管理 -->
+	<constant name="struts.objectFactory" value="spring"></constant>
+	<!-- class不要再以类路径了，用applicationContext.xml中配置的bean名 -->	
+	<package name="crm" namespace="/" extends="struts-default">
+	
+	
+	
+		<!-- 拦截器-->
+		<interceptors>
+			<!-- 注册拦截器 -->
+			<interceptor name="myInter" class="com.iteason.web.interceptor.PrivilegeInterceptor"></interceptor>
+			
+			<!-- 配置拦截器栈 -->
+			<interceptor-stack name="myStack">
+				<interceptor-ref name="myInter">
+					<!-- 指定不拦截的方法 -->
+					<param name="excludeMethods">regist,login</param>
+				</interceptor-ref>
+				<interceptor-ref name="defaultStack"></interceptor-ref>
+			</interceptor-stack>
+		
+		</interceptors>
+		
+		<!-- 指定默认拦截器栈 -->
+		<default-interceptor-ref name="myStack"></default-interceptor-ref>
+		
+		<!-- 定义全局的异常 -->
+	<!-- 	 <global-exception-mappings>
+			<exception-mapping result="error" exception="java.lang.RuntimeException"></exception-mapping>
+		</global-exception-mappings> -->
+	 
+	 <!-- 定义全局结果集 -->
+	 <global-results >
+	 	<result name="toLogin" type="redirect">/login.jsp</result>
+	 </global-results>
+	 
+		<action name="UserAction_*" class="userAction" method="{1}" >
+		
+			<result name="success" >/hello.jsp</result>
+			<result name="toHome" type="redirect">/index.jsp</result>
+			<result name="loginError" >/login.jsp</result>
+			<result name="registError" >/regist.jsp</result>
+			<result name="toLogin" type="redirect">/login.jsp</result>
+		</action>
+		
+		<action name="CustomerAction_*" class="customerAction" method="{1}" >
+			<result name="list" >/jsp/customer/list.jsp</result>
+			<result name="toList" type="redirectAction">
+				<param name="namespace">/</param>
+				<param name="actionName">CustomerAction_list</param>
+			</result>
+			<result name="toEdit" >/jsp/customer/add.jsp</result>
+			<result name="industryCount" >/industryCount.jsp</result>
+		</action>
+		
+		<action name="BaseDictAction" class="baseDictAction" method="execute"></action>
+		
+		<action name="LinkManAction_*" class="linkManAction" method="{1}" >
+			<result name="list" >/jsp/linkman/list.jsp</result>
+			<result name="toList" type="redirectAction" >
+				<param name="namespace">/</param>
+				<param name="actionName" >LinkManAction_list</param>
+			</result>
+			<result name="toEdit" >/jsp/linkman/edit.jsp</result>
+		</action>
+		
+		<action name="SaleVisitAction_*" class="saleVisitAction" method="{1}" >
+			<result name="list" >jsp/salevisit/list.jsp</result>
+			<result name="toEdit" >jsp/salevisit/add.jsp</result>
+			<result name="toList" type="redirectAction">
+				<param name="namespace">/</param>
+				<param name="actionName">SaleVisitAction_list</param>
+			</result>
+		</action>
+		
+	</package>
+	
+</struts>

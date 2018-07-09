@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+   <!-- 配置表与实体对象的关系 -->
+   <!-- package属性:填写一个包名.在元素内部凡是需要书写完整类名的属性,可以直接写简答类名了. -->
+<hibernate-mapping package="com.iteason.domain" >
+	<!-- 
+		class元素: 配置实体与表的对应关系的
+			name: 完整类名
+			table:数据库表名
+	 -->
+	<class name="User" table="sys_user" >
+		
+		<id name="user_id"  >
+			<!-- generator:主键生成策略 -->
+			<generator class="native"></generator>
+		</id>
+		
+		<property name="user_code"  >
+			<!--  <column name="cust_name" sql-type="varchar" ></column> -->
+		</property>
+		<property name="user_name"  ></property>
+		<property name="user_password"  ></property>
+		<property name="user_state"  ></property>
+		
+		
+		<!-- 配置与SaleVisit的一对多关系 -->
+		<set name="saleVisits">
+			<key column="visit_user_id"></key>
+			<one-to-many class="SaleVisit"/>
+		</set>
+	</class>
+</hibernate-mapping>
